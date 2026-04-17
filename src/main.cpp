@@ -9,6 +9,10 @@
  
 //Controller
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
+
+// Other motors
+pros::Motor flywheelMotor(7, pros::MotorGearset::blue);
+pros::Motor launchMotor(8, pros::MotorGearset::blue);
  
 //Drivetrain motor groups
 pros::MotorGroup left_motors({-11, -12, -20}, pros::MotorGearset::blue);
@@ -64,8 +68,7 @@ lemlib::ExpoDriveCurve steer_cure(3, // joystick deadband out of 127
 lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sensors, &throttle_cure, &steer_cure);
  
 
-//Motor Declaration
-// pros::Motor example_Motor(7, pros::MotorGearset::blue); 
+
  
 //Solenoids set-up
 //pros::adi::Pneumatics SOLENOID_NAME = pros::adi::Pneumatics('A', false);\
@@ -167,7 +170,7 @@ void autonomous() {
 void opcontrol() {
     while (true) {
  
- *       //Drive Inputs
+        //Drive Inputs
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
  
@@ -175,7 +178,15 @@ void opcontrol() {
         chassis.arcade(leftY, rightX, false, 0.75);
  
         if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            //Action
+            flywheelMotor.move(127);
+        } else {
+            flywheelMotor.move(0);
+        }
+
+        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+            launchMotor.move(127);
+        } else {
+            launchMotor.move(0);
         }
 
         pros::delay(10);
